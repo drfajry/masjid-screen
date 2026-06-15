@@ -1,0 +1,110 @@
+/*
+ * نظام الثيمات — يُطبَّق عبر data-theme على <body>.
+ * كل ثيم يعيد تعريف متغيّرات الألوان فقط؛ البنية تبقى كما هي.
+ * الثيم الافتراضي (الليلي) معرّف في :root داخل display.css.
+ *
+ * ملاحظة: شاشة الإقامة (#iqama) تبقى سوداء في كل الثيمات (متطلّب: شاشة سوداء + "أغلق الجوال").
+ */
+
+/* قوس المحراب خلف الساعة (عنصر مميِّز) — يظهر في الثيمات ذات الطابع الزخرفي */
+.center::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 52vh; height: 64vh;
+  transform: translate(-50%, -54%);
+  border: 2px solid var(--arch, transparent);
+  border-radius: 50% 50% 8% 8% / 60% 60% 8% 8%;
+  opacity: .5;
+  pointer-events: none;
+  z-index: 0;
+}
+.center > * { position: relative; z-index: 1; }
+body.portrait .center::before { width: 70vw; height: 50vh; }
+
+/* ============ ثيم الجفالي: خلفية عودية، خطوط بيضاء، زخرفة فاتحة ============ */
+body[data-theme="jafali"] {
+  --bg-1: #6e1f29;
+  --bg-2: #862530;
+  --bg-3: #4f161d;
+  --gold: #f0dcc0;
+  --gold-soft: #f7ecdb;
+  --teal: #f5e8d6;
+  --green: #f5e8d6;
+  --ink: #ffffff;
+  --ink-dim: rgba(255, 255, 255, .82);
+  --panel: rgba(255, 255, 255, .08);
+  --panel-line: rgba(255, 255, 255, .26);
+  --highlight: rgba(255, 255, 255, .16);
+  --arch: rgba(255, 255, 255, .35);
+}
+body[data-theme="jafali"]::before {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 2px, transparent 2px 26px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.035) 0 2px, transparent 2px 26px);
+}
+body[data-theme="jafali"] .pcard.next {
+  box-shadow: 0 0 0 1px var(--gold), 0 8px 30px rgba(255,255,255,.12);
+}
+body[data-theme="jafali"] #countdown { background: rgba(60, 16, 22, .94); }
+body[data-theme="jafali"] #adhkar {
+  background: radial-gradient(900px 600px at 50% 0%, #7d2530, #4a141b);
+}
+
+/* ============ ثيم زيتوني: أخضر زيتوني + ذهبي ============ */
+body[data-theme="olive"] {
+  --bg-1: #34431f;
+  --bg-2: #3e4f27;
+  --bg-3: #28331a;
+  --gold: #cdb069;
+  --gold-soft: #e2cd92;
+  --teal: #e6d9b0;
+  --green: #e6d9b0;
+  --ink: #f7f4e9;
+  --ink-dim: rgba(247, 244, 233, .78);
+  --panel: rgba(255, 255, 255, .06);
+  --panel-line: rgba(226, 205, 146, .35);
+  --highlight: rgba(226, 205, 146, .16);
+  --arch: rgba(226, 205, 146, .5);
+}
+body[data-theme="olive"]::before {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(226,205,146,.04) 0 2px, transparent 2px 26px),
+    repeating-linear-gradient(-45deg, rgba(226,205,146,.04) 0 2px, transparent 2px 26px);
+}
+body[data-theme="olive"] #countdown { background: rgba(30, 40, 18, .94); }
+body[data-theme="olive"] #adhkar {
+  background: radial-gradient(900px 600px at 50% 0%, #3e4f27, #222d16);
+}
+
+/* ============ ثيم فاتح: خلفية بيضاء + زخرفة رمادية + مواقيت ملوّنة ============ */
+body[data-theme="light"] {
+  --bg-1: #fcfcfa;
+  --bg-2: #f1f1ec;
+  --bg-3: #e6e6df;
+  --gold: #9a6b1f;
+  --gold-soft: #862530;   /* اسم المسجد والعناوين بالعودي */
+  --teal: #1f8a4c;        /* الإقامة بالأخضر */
+  --green: #1f8a4c;
+  --ink: #1f2328;         /* نص داكن على فاتح */
+  --ink-dim: #6b7280;
+  --panel: rgba(0, 0, 0, .035);
+  --panel-line: rgba(134, 37, 48, .20);
+  --highlight: rgba(134, 37, 48, .08);
+  --arch: rgba(134, 37, 48, .18);
+}
+body[data-theme="light"]::before {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(0,0,0,.04) 0 2px, transparent 2px 24px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.04) 0 2px, transparent 2px 24px);
+}
+body[data-theme="light"] .pazan { color: #862530; }      /* الأذان بالعودي */
+body[data-theme="light"] .clock { text-shadow: 0 4px 24px rgba(0,0,0,.12); }
+body[data-theme="light"] .ring .bg { stroke: rgba(0,0,0,.10); }
+body[data-theme="light"] .ring .fg { stroke: #862530; filter: drop-shadow(0 0 8px rgba(134,37,48,.35)); }
+body[data-theme="light"] .ring.seconds .fg { stroke: #1f8a4c; filter: drop-shadow(0 0 8px rgba(31,138,76,.35)); }
+body[data-theme="light"] #countdown { background: rgba(248, 248, 245, .95); backdrop-filter: blur(4px); }
+body[data-theme="light"] #adhkar {
+  background: radial-gradient(900px 600px at 50% 0%, #ffffff, #ececE6);
+}
+body[data-theme="light"] .adh-dots i { background: rgba(0,0,0,.15); }

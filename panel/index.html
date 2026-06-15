@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>لوحة تحكم المسجد</title>
+<link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+
+<!-- تسجيل الدخول -->
+<div id="login">
+  <div class="login-card">
+    <h1>لوحة تحكم المسجد</h1>
+    <p>الدخول الافتراضي: admin / admin</p>
+    <div class="row" style="border:none"><input id="lgUser" placeholder="اسم المستخدم" /></div>
+    <div class="row" style="border:none"><input id="lgPass" type="password" placeholder="كلمة المرور" /></div>
+    <button class="btn" onclick="App.login()">دخول</button>
+    <p id="lgErr" style="color:var(--red);margin-top:10px"></p>
+  </div>
+</div>
+
+<!-- التطبيق -->
+<div id="appui" class="hidden">
+  <div class="topbar">
+    <div class="title">🕌 تحكم المسجد</div>
+    <div class="who"><span id="whoName"></span> · <a href="#" onclick="App.logout();return false" style="color:var(--teal)">خروج</a></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="wrap">
+
+    <!-- الهوية -->
+    <div class="section" data-sec="identity">
+      <div class="card">
+        <h2>هوية المسجد</h2>
+        <div class="hint">يتم التحديث على الشاشة فوراً</div>
+        <div class="row"><label>اسم المسجد</label><input id="mName" /></div>
+        <div class="row"><label>الشعار</label><input type="file" id="mLogo" accept="image/*" /></div>
+        <div class="row"><label>الاتجاه</label>
+          <select id="orientation" style="width:160px"><option value="landscape">أفقي 16:9</option><option value="portrait">عمودي 9:16</option></select>
+        </div>
+        <div class="row"><label>الثيم (المظهر)</label>
+          <select id="theme" style="width:160px">
+            <option value="night">ليلي (أزرق/ذهبي)</option>
+            <option value="jafali">الجفالي (عودي/أبيض)</option>
+            <option value="olive">زيتوني</option>
+            <option value="light">فاتح</option>
+          </select>
+        </div>
+        <button class="btn" onclick="App.saveIdentity()">حفظ الهوية</button>
+      </div>
+    </div>
+
+    <!-- أوقات الصلاة -->
+    <div class="section" data-sec="times">
+      <div class="card">
+        <h2>موقع المسجد</h2>
+        <div class="hint">يُستخدم لحساب المواقيت (تقويم أم القرى). يضبطه GPS تلقائياً إن وُجد.</div>
+        <div class="row"><label>اختر مدينة</label>
+          <select id="cityPreset" style="width:180px">
+            <option value="">— مخصّص —</option>
+          </select>
+        </div>
+        <div class="row"><label>اسم المدينة</label><input id="locCity" placeholder="مثال: المدينة المنورة"></div>
+        <div class="row"><label>خط العرض (Lat)</label><input class="num" id="locLat" type="number" step="0.0001" style="width:130px"></div>
+        <div class="row"><label>خط الطول (Lng)</label><input class="num" id="locLng" type="number" step="0.0001" style="width:130px"></div>
+        <button class="btn" onclick="App.saveLocation()">حفظ الموقع</button>
+      </div>
+      <div class="card">
+        <h2>تعديل أوقات الصلاة (بالدقائق)</h2>
+        <div class="hint">+ تأخير · − تقديم · تقويم أم القرى</div>
+        <div id="adjRows"></div>
+      </div>
+      <div class="card">
+        <h2>التاريخ الهجري</h2>
+        <div class="hint">مراعاة الرؤية الشرعية</div>
+        <div class="row"><label>إزاحة الأيام</label><div id="hijriStep"></div></div>
+      </div>
+      <div class="card">
+        <h2>رمضان — العشاء</h2>
+        <div class="hint">يُطبّق تلقائياً في رمضان فقط (تقديم/تأخير بالدقائق)</div>
+        <div class="row"><label>إزاحة العشاء في رمضان</label><div id="ramStep"></div></div>
+      </div>
+      <button class="btn" onclick="App.saveTimes()">حفظ أوقات الصلاة</button>
+    </div>
+
+    <!-- الإقامة -->
+    <div class="section" data-sec="iqama">
+      <div class="card">
+        <h2>فجوة الإقامة لكل صلاة (دقائق بعد الأذان)</h2>
+        <div class="hint">العداد الدائري يعتمد على هذه القيم</div>
+        <div id="iqamaRows"></div>
+        <button class="btn" onclick="App.saveIqama()">حفظ أوقات الإقامة</button>
+      </div>
+      <div class="card">
+        <h2>إعدادات العداد والتنبيه</h2>
+        <div class="row"><label>إظهار العداد الدائري</label><label class="switch"><input type="checkbox" id="cdEnabled"><span class="slider"></span></label></div>
+        <div class="row"><label>إظهار الثلث الأخير</label><label class="switch"><input type="checkbox" id="ltShow"><span class="slider"></span></label></div>
+        <div class="row"><label>نغمة دخول الوقت</label><label class="switch"><input type="checkbox" id="toneEnabled"><span class="slider"></span></label></div>
+        <div class="row"><label>مستوى الصوت</label><input type="range" id="toneVol" min="0" max="1" step="0.05" style="width:160px"></div>
+        <div class="row"><label>مدة صمت المكبّر للعودة (ثانية)</label><input class="num" id="silenceSec" type="number"></div>
+        <button class="btn" onclick="App.saveCounters()">حفظ الإعدادات</button>
+      </div>
+    </div>
+
+    <!-- التحكم المباشر -->
+    <div class="section" data-sec="live">
+      <div class="card">
+        <h2>تحكم مباشر بالشاشة</h2>
+        <div class="hint">للتحكم اليدوي بوضع الإقامة والأذكار (مفيد قبل ربط مراقبة الصوت)</div>
+        <div class="iqama-ctl" id="liveCtl"></div>
+        <div class="btn-row">
+          <button class="btn teal" onclick="App.cmd('show_adhkar')">عرض الأذكار</button>
+          <button class="btn green" onclick="App.cmd('return_normal')">العودة للرئيسية</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- الأذكار -->
+    <div class="section" data-sec="adhkar">
+      <div class="card">
+        <h2>أذكار ما بعد الصلاة</h2>
+        <div class="row"><label>طريقة العرض</label>
+          <select id="adhMode" style="width:200px">
+            <option value="one_screen">جميع الأذكار في شاشة</option>
+            <option value="two_screens">على شاشتين</option>
+            <option value="three_screens">على ثلاث شاشات</option>
+            <option value="one_per_screen">كل ذكر في شاشة</option>
+          </select>
+        </div>
+        <div class="row"><label>مدة كل شاشة (ثانية)</label><input class="num" id="adhSec" type="number"></div>
+        <button class="btn" onclick="App.saveAdhkar()">حفظ</button>
+      </div>
+    </div>
+
+    <!-- الجنازة -->
+    <div class="section" data-sec="funeral">
+      <div class="card">
+        <h2>تنبيه الجنازة</h2>
+        <div class="row"><label>تفعيل التنبيه</label><label class="switch"><input type="checkbox" id="funActive"><span class="slider"></span></label></div>
+        <div class="row"><label>الصلاة المرتبطة</label>
+          <select id="funPrayer" style="width:140px">
+            <option value="fajr">الفجر</option><option value="dhuhr">الظهر</option><option value="asr">العصر</option>
+            <option value="maghrib">المغرب</option><option value="isha">العشاء</option>
+          </select>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+          <label style="margin-bottom:8px">نص مخصص (اتركه فارغاً للنص الافتراضي)</label>
+          <textarea id="funText" rows="2" placeholder="صلاة جنازة بعد العصر"></textarea>
+        </div>
+        <button class="btn" onclick="App.saveFuneral()">حفظ تنبيه الجنازة</button>
+      </div>
+    </div>
+
+    <!-- المناسبات -->
+    <div class="section" data-sec="occasions">
+      <div class="card">
+        <h2>المناسبات الخاصة</h2>
+        <div class="hint">إقامة ورسالة مستقلة لكل مناسبة</div>
+        <div id="occRows"></div>
+        <button class="btn" onclick="App.saveOccasions()">حفظ المناسبات</button>
+      </div>
+    </div>
+
+    <!-- المستخدمون -->
+    <div class="section" data-sec="users">
+      <div class="card">
+        <h2>إدارة المستخدمين</h2>
+        <table id="usersTbl"><thead><tr><th>المستخدم</th><th>الصلاحية</th><th></th></tr></thead><tbody></tbody></table>
+        <div class="grid2" style="margin-top:14px">
+          <input id="nuUser" placeholder="اسم مستخدم"><input id="nuPass" type="password" placeholder="كلمة المرور">
+        </div>
+        <button class="btn sm" style="margin-top:10px;width:auto" onclick="App.addUser()">إضافة مستخدم</button>
+      </div>
+    </div>
+
+    <!-- السجل -->
+    <div class="section" data-sec="logs">
+      <div class="card">
+        <h2>سجل العمليات</h2>
+        <div class="grid2" style="margin-bottom:10px">
+          <input id="logSearch" placeholder="بحث..." oninput="App.loadLogs()">
+          <button class="btn sm" onclick="App.exportLogs()">تصدير CSV</button>
+        </div>
+        <table id="logsTbl"><thead><tr><th>الوقت</th><th>المستخدم</th><th>العملية</th><th>العنصر</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- النظام -->
+    <!-- مزامنة الوقت -->
+    <div class="section" data-sec="timesync">
+      <div class="card">
+        <h2>مزامنة الوقت</h2>
+        <div class="hint">يصحّح فرق ساعة الجهاز دون تغيير ساعة النظام</div>
+        <div class="row"><label>الوقت الحالي على الشاشة</label><span id="tsNow" style="color:var(--teal);font-weight:700"></span></div>
+        <div class="row"><label>الوضع</label>
+          <select id="tsMode" style="width:200px">
+            <option value="auto">تلقائي (عند توفر الإنترنت)</option>
+            <option value="manual">يدوي</option>
+            <option value="off">معطّل</option>
+          </select>
+        </div>
+        <div class="row"><label>دورية المزامنة (دقيقة)</label><input class="num" id="tsInterval" type="number"></div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+          <label style="margin-bottom:6px">مصدر الوقت (رابط)</label>
+          <input id="tsHost" placeholder="https://www.google.com">
+        </div>
+        <button class="btn" onclick="App.saveTimeSync()">حفظ إعدادات المزامنة</button>
+      </div>
+
+      <div class="card" style="background:var(--card2)">
+        <h2 style="font-size:15px">مزامنة فورية</h2>
+        <div class="hint">حالة آخر مزامنة:</div>
+        <div class="row"><label>آخر مزامنة</label><span id="tsLast" style="color:var(--teal)">—</span></div>
+        <div class="row"><label>الإزاحة الحالية</label><span id="tsOffset">—</span></div>
+        <button class="btn" onclick="App.timeSyncNow()">مزامنة الآن من الإنترنت</button>
+      </div>
+
+      <div class="card" style="background:var(--card2)">
+        <h2 style="font-size:15px">ضبط يدوي</h2>
+        <div class="hint">أدخل الوقت الصحيح ثم اضغط ضبط (للعمل دون إنترنت)</div>
+        <div class="row" style="flex-direction:column;align-items:stretch">
+          <input id="tsManual" type="datetime-local" step="1">
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" onclick="App.timeManualFill()">تعبئة من هذا الجهاز</button>
+          <button class="btn" onclick="App.timeManualSet()">ضبط الوقت</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- جهاز GPS -->
+    <div class="section" data-sec="gps">
+      <div class="card">
+        <h2>جهاز GPS</h2>
+        <div class="hint">يضبط الموقع والوقت تلقائياً عند توفّر إشارة — دون إنترنت</div>
+        <div class="row"><label>الحالة</label><span id="gpsState" style="font-weight:700">—</span></div>
+        <div class="row"><label>الإحداثيات</label><span id="gpsCoords" style="color:var(--teal)">—</span></div>
+        <div class="row"><label>عدد الأقمار</label><span id="gpsSats">—</span></div>
+        <div class="row"><label>المنفذ المتصل</label><span id="gpsPort">—</span></div>
+        <div class="row"><label>آخر إشارة</label><span id="gpsLastFix">—</span></div>
+        <button class="btn" onclick="App.gpsScan()">بحث عن الجهاز تلقائياً</button>
+      </div>
+
+      <div class="card" style="background:var(--card2)">
+        <h2 style="font-size:15px">الإعدادات</h2>
+        <div class="row"><label>تفعيل GPS</label><label class="switch"><input type="checkbox" id="gpsEnabled"><span class="slider"></span></label></div>
+        <div class="row"><label>ضبط الموقع تلقائياً</label><label class="switch"><input type="checkbox" id="gpsAutoLoc"><span class="slider"></span></label></div>
+        <div class="row"><label>ضبط الوقت تلقائياً</label><label class="switch"><input type="checkbox" id="gpsAutoTime"><span class="slider"></span></label></div>
+        <div class="row"><label>المنفذ</label>
+          <select id="gpsPortSel" style="width:200px"><option value="auto">كشف تلقائي</option></select>
+        </div>
+        <div class="row"><label>سرعة المنفذ (baud)</label><input class="num" id="gpsBaud" type="number"></div>
+        <button class="btn" onclick="App.saveGps()">حفظ إعدادات GPS</button>
+      </div>
+    </div>
+
+    <!-- مراقبة المكسر -->
+    <div class="section" data-sec="mixer">
+      <div class="card">
+        <h2>مراقبة إشارة المكسر</h2>
+        <div class="hint">إشارة كهربائية (نشط/متوقف) للعودة التلقائية بعد انتهاء الصلاة</div>
+        <div class="row"><label>الحالة الآن</label><span id="sigState" style="font-weight:700">—</span></div>
+        <div class="row"><label>المصدر</label><span id="sigSource">—</span></div>
+        <div class="row"><label>آخر نشاط</label><span id="sigLast">—</span></div>
+      </div>
+
+      <div class="card" style="background:var(--card2)">
+        <h2 style="font-size:15px">الإعدادات</h2>
+        <div class="row"><label>تفعيل المراقبة</label><label class="switch"><input type="checkbox" id="sigEnabled"><span class="slider"></span></label></div>
+        <div class="row"><label>المصدر</label>
+          <select id="sigSourceSel" style="width:200px">
+            <option value="http">جهاز عبر الشبكة</option>
+            <option value="serial">لوحة USB (منفذ تسلسلي)</option>
+          </select>
+        </div>
+        <div class="row"><label>مدة الانقطاع للعودة (ثانية)</label><input class="num" id="sigReturn" type="number"></div>
+
+        <div id="sigHttpBox">
+          <div class="hint">وجّه الجهاز الخارجي ليرسل الحالة إلى:</div>
+          <div class="row" style="flex-direction:column;align-items:stretch">
+            <code id="sigUrl" style="color:var(--teal);direction:ltr;font-size:12px;word-break:break-all"></code>
+          </div>
+          <div class="hint">POST {"active":true} أثناء الصلاة، أو نبضة على /ping (متوقف بعد):</div>
+          <div class="row"><label>مهلة النبض (ثانية)</label><input class="num" id="sigGrace" type="number"></div>
+        </div>
+
+        <div id="sigSerialBox" style="display:none">
+          <div class="row"><label>المنفذ</label><input id="sigPort" placeholder="auto أو COM3"></div>
+          <div class="row"><label>سرعة المنفذ (baud)</label><input class="num" id="sigBaud" type="number"></div>
+          <div class="row"><label>طلب hex (اختياري)</label><input id="sigQuery" placeholder="مثال: A1"></div>
+          <div class="row"><label>موضع بايت الحالة</label><input class="num" id="sigByteIdx" type="number"></div>
+          <div class="row"><label>قناع البِت</label><input class="num" id="sigMask" type="number"></div>
+          <div class="row"><label>البِت العالي = نشط</label><label class="switch"><input type="checkbox" id="sigActiveHigh"><span class="slider"></span></label></div>
+          <div class="row"><label>حالة المنفذ</label><span id="sigSerial">—</span></div>
+        </div>
+
+        <button class="btn" onclick="App.saveMixer()">حفظ إعدادات المراقبة</button>
+      </div>
+    </div>
+
+    <!-- التحديثات -->
+    <div class="section" data-sec="update">
+      <div class="card">
+        <h2>التحديثات</h2>
+        <div class="hint">تحديث تلقائي من الإنترنت عبر GitHub Releases</div>
+        <div class="row"><label>الإصدار الحالي</label><span id="updCurrent" style="color:var(--teal)">—</span></div>
+        <div class="row"><label>الحالة</label><span id="updState">—</span></div>
+        <div class="row"><label>الإصدار المتاح</label><span id="updNew">—</span></div>
+        <div class="row"><label>التقدّم</label><span id="updProgress"></span></div>
+        <div class="btn-row">
+          <button class="btn" onclick="App.updateCheck()">التحقق من التحديثات</button>
+          <button class="btn ghost" id="updInstall" onclick="App.updateInstall()" disabled>تثبيت وإعادة التشغيل</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- النظام -->
+    <div class="section" data-sec="system">
+      <div class="card">
+        <h2>روابط الوصول</h2>
+        <div class="hint">افتح هذه الروابط من أي جهاز على نفس الشبكة</div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:6px">
+          <label>لوحة التحكم (الجوال)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <code id="lnkPanel" style="flex:1;color:var(--teal);direction:ltr;font-size:13px;word-break:break-all"></code>
+            <button class="btn sm ghost" onclick="App.copyLink('lnkPanel')">نسخ</button>
+          </div>
+        </div>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:6px">
+          <label>شاشة العرض</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <code id="lnkDisplay" style="flex:1;color:var(--teal);direction:ltr;font-size:13px;word-break:break-all"></code>
+            <button class="btn sm ghost" onclick="App.copyLink('lnkDisplay')">نسخ</button>
+          </div>
+        </div>
+        <div class="hint" id="lnkHint" style="margin-top:6px"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px">
+          <div id="qrBox" style="background:#fff;padding:10px;border-radius:12px;line-height:0"></div>
+          <div class="hint">امسح الرمز لفتح لوحة التحكم على جوال آخر</div>
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--card2)">
+        <h2 style="font-size:15px">تشغيل النظام</h2>
+        <div class="btn-row">
+          <button class="btn ghost" onclick="App.cmd('reload')">تحديث الشاشة</button>
+          <button class="btn red" onclick="App.restart()">إعادة تشغيل النظام</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<!-- وحدات اللوحة (الترتيب مهم: core أولاً، boot أخيراً) -->
+<script src="/vendor/qrcode.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/save.js"></script>
+<script src="js/users-logs.js"></script>
+<script src="js/timesync.js"></script>
+<script src="js/gps.js"></script>
+<script src="js/signal.js"></script>
+<script src="js/update.js"></script>
+<script src="js/links.js"></script>
+<script src="js/location.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>

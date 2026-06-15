@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شاشة المسجد</title>
+  <link rel="stylesheet" href="css/fonts.css" />
+  <link rel="stylesheet" href="display.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- الشاشة الرئيسية -->
+    <section id="main" class="screen active">
+      <div class="header">
+        <div class="identity">
+          <img id="logo" alt="" style="display:none" />
+          <div class="mosque-name" id="mosqueName">المسجد</div>
+        </div>
+        <div class="date-block">
+          <div class="date-hijri" id="dateHijri">—</div>
+          <div class="date-greg" id="dateGreg">—</div>
+        </div>
+      </div>
+
+      <div class="center">
+        <div class="clock" id="clock">--:--</div>
+        <div class="next-row">
+          الصلاة القادمة <b id="nextName">—</b> بعد <span class="next-countdown" id="nextCountdown">—</span>
+        </div>
+        <div class="lastthird" id="lastThird">
+          الثلث الأخير يبدأ <b id="ltStart">—</b> · المتبقي <b id="ltRemain">—</b>
+        </div>
+      </div>
+
+      <div class="funeral" id="funeral"></div>
+      <div class="prayers" id="prayers"></div>
+    </section>
+
+    <!-- العداد الدائري للإقامة -->
+    <section id="countdown" class="screen">
+      <div class="cd-title">باقٍ على إقامة الصلاة</div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 300 300">
+          <circle class="bg" cx="150" cy="150" r="130"></circle>
+          <circle class="fg" id="ringFg" cx="150" cy="150" r="130"></circle>
+        </svg>
+        <div class="num">
+          <div class="big" id="cdBig">--</div>
+          <div class="unit" id="cdUnit">دقيقة</div>
+        </div>
+      </div>
+      <div class="cd-prayer" id="cdPrayer">—</div>
+    </section>
+
+    <!-- وضع الإقامة (شاشة سوداء) -->
+    <section id="iqama" class="screen">
+      <div class="iq-icon">📵</div>
+      <div class="iq-clock" id="iqClock">--:--</div>
+      <div class="iq-msg">فضلاً أغلق الجوال</div>
+    </section>
+
+    <!-- الأذكار بعد الصلاة -->
+    <section id="adhkar" class="screen">
+      <div class="adh-head">أذكار ما بعد الصلاة</div>
+      <div class="adh-grid cols-1" id="adhGrid"></div>
+      <div class="adh-dots" id="adhDots"></div>
+    </section>
+
+  </div>
+
+  <!-- المكتبات والمحرك -->
+  <script src="/vendor/adhan.umd.min.js"></script>
+  <script src="/core/prayer.js"></script>
+  <!-- بيانات الأذكار -->
+  <script src="js/adhkar-data.js"></script>
+  <!-- وحدات الشاشة (الترتيب مهم: core أولاً، connection أخيراً) -->
+  <script src="js/core.js"></script>
+  <script src="js/clock.js"></script>
+  <script src="js/tone.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/countdown.js"></script>
+  <script src="js/adhkar-view.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/connection.js"></script>
+</body>
+</html>

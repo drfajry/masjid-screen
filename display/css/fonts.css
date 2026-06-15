@@ -1,0 +1,23 @@
+/* خط Cairo العربي مضمّن محلياً (يعمل دون إنترنت) — واضح للقراءة من بعيد.
+   ثلاثة أوزان: 500 للنصوص، 700 للعناوين، 900 للساعة والمواقيت. */
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/cairo-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/cairo-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('../fonts/cairo-900.woff2') format('woff2');
+}

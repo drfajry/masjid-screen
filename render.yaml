@@ -1,0 +1,24 @@
+# مخطط نشر Render — نشر سحابي بنقرة
+# ارفع المستودع على GitHub ثم: Render → New → Blueprint → اختر المستودع.
+services:
+  - type: web
+    name: masjid-screen
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node core/standalone.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # للتخزين الدائم على GitHub (اختياري لكن مُوصى به على الخطة المجانية):
+      # أنشئ مستودع بيانات خاصاً وتوكن fine-grained بصلاحية Contents (read/write)
+      - key: GITHUB_TOKEN
+        sync: false        # يُدخل يدوياً في لوحة Render (سرّي)
+      - key: GITHUB_REPO
+        sync: false        # مثال: drfajry/masjid-data
+      - key: GITHUB_PATH
+        value: masjid-data.json
+      - key: GITHUB_BRANCH
+        value: main

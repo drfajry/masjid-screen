@@ -1,0 +1,61 @@
+{
+  "name": "masjid-screen",
+  "productName": "MasjidScreen",
+  "version": "1.0.0",
+  "description": "نظام شاشة مسجد ذكية - عرض أوقات الصلاة والإقامة والأذكار مع لوحة تحكم من الجوال",
+  "main": "main.js",
+  "author": "د. فيصل",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "server": "node core/standalone.js",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.drfajry.masjidscreen",
+    "productName": "MasjidScreen",
+    "asar": true,
+    "files": [
+      "**/*",
+      "!data/**",
+      "!dist/**"
+    ],
+    "extraResources": [
+      "vendor/**"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "شاشة المسجد"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "drfajry",
+        "repo": "masjid-screen"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9",
+    "express": "^4.22.2",
+    "ws": "^8.21.0"
+  },
+  "optionalDependencies": {
+    "@serialport/parser-readline": "^12.0.0",
+    "serialport": "^12.0.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^3.7.1",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
+  }
+}
