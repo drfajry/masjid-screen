@@ -43,9 +43,9 @@
     }).format(d) ;
   }
 
-  // نص التاريخ الميلادي بالعربية
+  // نص التاريخ الميلادي بالعربية (نُجبر التقويم الميلادي صراحةً؛ وإلا يتحوّل لهجري على أجهزة السعودية)
   function gregorianString(date) {
-    return new Intl.DateTimeFormat('ar-SA', {
+    return new Intl.DateTimeFormat('ar-u-ca-gregory', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     }).format(date);
   }
